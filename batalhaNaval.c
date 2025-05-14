@@ -1,8 +1,12 @@
 #include <stdio.h>
 
+
+
 // Desafio Batalha Naval - MateCheck
 // Este código inicial serve como base para o desenvolvimento do sistema de Batalha Naval.
 // Siga os comentários para implementar cada parte do desafio.
+#define LINHAS 10
+#define COLUNAS 10
 
 int main() {
     // Nível Novato - Posicionamento dos Navios
@@ -37,43 +41,62 @@ int main() {
     // 0 0 1 0 0
 
 
-    // Definindo o tamanho do tabuleiro e do navio diretamente no código
-    int tabuleiro[10][10] = {0};  // Tabuleiro 10x10 inicializado com 0 (água)
+        // Definindo o tabuleiro 10x10, inicialmente com valor 0 (água)
+    int tabuleiro[LINHAS][COLUNAS] = {0};
 
-    // Posições dos navios
-    int linha_horizontal = 2;  // Linha do navio horizontal
-    int coluna_horizontal = 4; // Coluna do navio horizontal
+    // Posicionamento dos navios
+    // Horizontal
+    int linha_horizontal = 2;
+    int coluna_horizontal = 4;
 
-    int linha_vertical = 5;    // Linha do navio vertical
-    int coluna_vertical = 7;  // Coluna do navio vertical
+    // Vertical
+    int linha_vertical = 5;
+    int coluna_vertical = 7;
 
-    // Posicionar o navio horizontal. O navio horizontal tem 3 partes
+    // Diagonal principal (top-left para bottom-right)
+    int linha_diagonal1 = 1;
+    int coluna_diagonal1 = 1;
+
+    // Diagonal secundária (top-right para bottom-left)
+    int linha_diagonal2 = 3;
+    int coluna_diagonal2 = 7;
+
+    // Posicionar o navio horizontal
     for (int i = 0; i < 3; i++) 
     {
-        tabuleiro[linha_horizontal][coluna_horizontal + i] = 3;  // Coloca "3" no tabuleiro
+        tabuleiro[linha_horizontal][coluna_horizontal + i] = 3;
     }
 
-    // Posicionar o navio vertical. O navio vertical também tem 3 partes
+    // Posicionar o navio vertical
     for (int i = 0; i < 3; i++) 
-    {  
-        tabuleiro[linha_vertical + i][coluna_vertical] = 3;  // Coloca "3" no tabuleiro
+    {
+        tabuleiro[linha_vertical + i][coluna_vertical] = 3;
+    }
+
+    // Posicionar o navio diagonal 1 (top-left para bottom-right)
+    for (int i = 0; i < 3; i++) {
+        tabuleiro[linha_diagonal1 + i][coluna_diagonal1 + i] = 3;
+    }
+
+    // Posicionar o navio diagonal 2 (top-right para bottom-left)
+    for (int i = 0; i < 3; i++) 
+    {
+        tabuleiro[linha_diagonal2 + i][coluna_diagonal2 - i] = 3;
     }
 
     // Exibir o tabuleiro com as letras de A a J para as colunas
     printf("    A  B  C  D  E  F  G  H  I  J\n");
 
-    for (int i = 0; i < 10; i++) 
-    {
-        // Imprimir o número da linha à esquerda
-        printf("%2d ", i + 1);
+    // Exibir as linhas do tabuleiro
+    for (int i = 0; i < LINHAS; i++) {
+        printf("%2d ", i + 1); // Número da linha
 
-            // Imprimir cada elemento do tabuleiro
-            for (int j = 0; j < 10; j++) 
-            {
-                printf("%2d ", tabuleiro[i][j]);
-            }
+        for (int j = 0; j < COLUNAS; j++) {
+            printf("%2d ", tabuleiro[i][j]);
+        }
         printf("\n");
     }
+
 
     return 0;
 }
