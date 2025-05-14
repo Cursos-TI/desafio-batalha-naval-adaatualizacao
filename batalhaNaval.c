@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 
 
@@ -7,6 +8,158 @@
 // Siga os comentários para implementar cada parte do desafio.
 #define LINHAS 10
 #define COLUNAS 10
+
+// Função para inicializar tabuleiro com zeros
+void inicializaTabuleiro(int tab[LINHAS][COLUNAS]) 
+{
+    for (int i = 0; i < LINHAS; i++)
+        for (int j = 0; j < COLUNAS; j++)
+            tab[i][j] = 0;
+}
+
+// Função para posicionar navios (tamanho 3, 2 verticais/horizontais, 2 diagonais)
+int posicionaNavios(int tab[LINHAS][COLUNAS]) 
+{
+    // Dois navios horizontais/verticais (simples, sem validação pesada)
+    int navios[4][2] = 
+    {
+        {2, 4}, // navio horizontal na linha 2, coluna 4
+        {5, 7}, // navio vertical na linha 5, coluna 7
+        {0, 0}, // diagonal descendo
+        {9, 9}  // diagonal subindo
+    };
+
+    // Navio 1 horizontal (linha 2, col 4..6)
+    for (int i = 0; i < 3; i++) 
+    {
+        tab[navios[0][0]][navios[0][1] + i] = 3;
+    }
+
+    // Navio 2 vertical (linha 5..7, col 7)
+    for (int i = 0; i < 3; i++) 
+    {
+        tab[navios[1][0] + i][navios[1][1]] = 3;
+    }
+
+    // Navio 3 diagonal descendente (linha,col aumentam)
+    for (int i = 0; i < 3; i++) 
+    {
+        tab[navios[2][0] + i][navios[2][1] + i] = 3;
+    }
+
+    // Navio 4 diagonal ascendente (linha diminui, col aumenta)
+    for (int i = 0; i < 3; i++) 
+    {
+        tab[navios[3][0] - i][navios[3][1] - i] = 3;
+    }
+
+    return 0;
+}
+
+// Função para criar a matriz da habilidade Cone (5x5)
+void criaCone(int cone[5][5]) 
+{
+    // Cone apontando para baixo, base maior na parte inferior
+    // Usaremos uma lógica simples: a linha determina o "raio" da cone
+
+    for (int i = 0; i < 5; i++) 
+    {
+        int raio = i; // aumenta para baixo
+        for (int j = 0; j < 5; j++) 
+        {
+            // posição central é coluna 2 (0-based)
+            if (j >= 2 - raio && j <= 2 + raio)
+                cone[i][j] = 1;
+            else
+                cone[i][j] = 0;
+        }
+    }
+}
+
+// Função para criar a matriz da habilidade Cruz (5x5)
+void criaCruz(int cruz[5][5]) 
+{
+    for (int i = 0; i < 5; i++) 
+    {
+        for (int j = 0; j < 5; j++) 
+        {
+            if (i == 2 || j == 2) // linha e coluna centrais formam cruz
+                cruz[i][j] = 1;
+            else
+                cruz[i][j] = 0;
+        }
+    }
+}
+
+// Função para criar a matriz da habilidade Octaedro (5x5)
+void criaOctaedro(int octaedro[5][5]) 
+{
+    // Forma de losango
+    for (int i = 0; i < 5; i++) 
+    {
+        for (int j = 0; j < 5; j++) 
+        {
+            // distância manhattan do centro (2,2)
+            int dist = abs(i - 2) + abs(j - 2);
+            if (dist <= 2)
+                octaedro[i][j] = 1;
+            else
+                octaedro[i][j] = 0;
+        }
+    }
+}
+
+// Função para aplicar uma habilidade no tabuleiro
+void aplicaHabilidade(int tab[LINHAS][COLUNAS], int hab[5][5], int origemLinha, int origemColuna) 
+{
+    int meio = 2; // meio da matriz 5x5
+
+    for (int i = 0; i < 5; i++) 
+    {
+        for (int j = 0; j < 5; j++) 
+        {
+            if (hab[i][j] == 1) 
+            {
+                int linTab = origemLinha + (i - meio);
+                int colTab = origemColuna + (j - meio);
+
+                // Verifica limites do tabuleiro
+                if (linTab >= 0 && linTab < LINHAS && colTab >= 0 && colTab < COLUNAS) 
+                {
+                    // Se não for navio (3), marca habilidade com 5
+                    if (tab[linTab][colTab] == 0) 
+                    {
+                        tab[linTab][colTab] = 5;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Função para imprimir o tabuleiro formatado
+void imprimeTabuleiro(int tab[LINHAS][COLUNAS]) 
+{
+    printf("    A  B  C  D  E  F  G  H  I  J\n");
+    for (int i = 0; i < LINHAS; i++) 
+    {
+        printf("%2d ", i + 1);
+        for (int j = 0; j < COLUNAS; j++) 
+        {
+            if (tab[i][j] == 0)
+                printf(" . "); // água (ponto para visual ficar mais limpo)
+            else 
+                if (tab[i][j] == 3)
+                    printf(" N "); // navio
+            else 
+                if (tab[i][j] == 5)
+                    printf(" * "); // área de habilidade
+            else
+                printf(" ? "); // valor desconhecido
+        }
+        printf("\n");
+    }
+}
 
 int main() {
     // Nível Novato - Posicionamento dos Navios
@@ -41,62 +194,26 @@ int main() {
     // 0 0 1 0 0
 
 
-        // Definindo o tabuleiro 10x10, inicialmente com valor 0 (água)
-    int tabuleiro[LINHAS][COLUNAS] = {0};
+int tabuleiro[LINHAS][COLUNAS];    
+    int cone[5][5], cruz[5][5], octaedro[5][5];
 
-    // Posicionamento dos navios
-    // Horizontal
-    int linha_horizontal = 2;
-    int coluna_horizontal = 4;
+    inicializaTabuleiro(tabuleiro);
+    posicionaNavios(tabuleiro);
 
-    // Vertical
-    int linha_vertical = 5;
-    int coluna_vertical = 7;
+    criaCone(cone);
+    criaCruz(cruz);
+    criaOctaedro(octaedro);
 
-    // Diagonal principal (top-left para bottom-right)
-    int linha_diagonal1 = 1;
-    int coluna_diagonal1 = 1;
+    // Define pontos de origem das habilidades no tabuleiro
+    int origemConeLinha = 3, origemConeColuna = 3;
+    int origemCruzLinha = 7, origemCruzColuna = 7;
+    int origemOctaedroLinha = 5, origemOctaedroColuna = 2;
 
-    // Diagonal secundária (top-right para bottom-left)
-    int linha_diagonal2 = 3;
-    int coluna_diagonal2 = 7;
+    aplicaHabilidade(tabuleiro, cone, origemConeLinha, origemConeColuna);
+    aplicaHabilidade(tabuleiro, cruz, origemCruzLinha, origemCruzColuna);
+    aplicaHabilidade(tabuleiro, octaedro, origemOctaedroLinha, origemOctaedroColuna);
 
-    // Posicionar o navio horizontal
-    for (int i = 0; i < 3; i++) 
-    {
-        tabuleiro[linha_horizontal][coluna_horizontal + i] = 3;
-    }
-
-    // Posicionar o navio vertical
-    for (int i = 0; i < 3; i++) 
-    {
-        tabuleiro[linha_vertical + i][coluna_vertical] = 3;
-    }
-
-    // Posicionar o navio diagonal 1 (top-left para bottom-right)
-    for (int i = 0; i < 3; i++) {
-        tabuleiro[linha_diagonal1 + i][coluna_diagonal1 + i] = 3;
-    }
-
-    // Posicionar o navio diagonal 2 (top-right para bottom-left)
-    for (int i = 0; i < 3; i++) 
-    {
-        tabuleiro[linha_diagonal2 + i][coluna_diagonal2 - i] = 3;
-    }
-
-    // Exibir o tabuleiro com as letras de A a J para as colunas
-    printf("    A  B  C  D  E  F  G  H  I  J\n");
-
-    // Exibir as linhas do tabuleiro
-    for (int i = 0; i < LINHAS; i++) {
-        printf("%2d ", i + 1); // Número da linha
-
-        for (int j = 0; j < COLUNAS; j++) {
-            printf("%2d ", tabuleiro[i][j]);
-        }
-        printf("\n");
-    }
-
+    imprimeTabuleiro(tabuleiro);
 
     return 0;
 }
